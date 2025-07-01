@@ -1,9 +1,9 @@
 {
   "info": {
     "name": "AI Auth API Collection",
-    "description": "Complete authentication API testing collection with all endpoints including social login (Google & GitHub), update email/phone functionality, and 2FA support",
+    "description": "Complete authentication API testing collection with all endpoints including social login (Google & GitHub), change password, update email/phone functionality, and 2FA support",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "version": "3.0.0"
+    "version": "3.1.0"
   },
   "auth": {
     "type": "bearer",
@@ -270,6 +270,58 @@
               "host": ["{{base_url}}"],
               "path": ["reset-password"]
             }
+          }
+        },
+        {
+          "name": "3. Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"SecurePass123!\",\n  \"newPassword\": \"NewSecurePass456!\",\n  \"confirmPassword\": \"NewSecurePass456!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/change-password",
+              "host": ["{{base_url}}"],
+              "path": ["change-password"]
+            },
+            "description": "Change password for authenticated user. Requires current password verification."
+          }
+        },
+        {
+          "name": "4. Admin Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"target-user-uuid\",\n  \"newPassword\": \"AdminSetPass123!\",\n  \"confirmPassword\": \"AdminSetPass123!\",\n  \"reason\": \"User requested password reset due to security concern\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/change-password",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "change-password"]
+            },
+            "description": "Admin-only endpoint to change another user's password. Requires admin role."
           }
         }
       ]

@@ -10,6 +10,7 @@ A comprehensive, secure, and scalable authentication backend built with Node.js,
 - **Social Login** (Google, GitHub) with OAuth 2.0 integration
 - **JWT Authentication** with access & refresh tokens
 - **Password Reset** via email or SMS
+- **Change Password** with current password verification
 
 ### Verification System
 - **Email Verification** via OTP (Nodemailer)
@@ -25,6 +26,7 @@ A comprehensive, secure, and scalable authentication backend built with Node.js,
 - **Rate Limiting** on all endpoints
 - **Account Lockout** after failed attempts
 - **Password Strength Validation**
+- **Change Password Security** (session invalidation)
 - **Secure Token Management**
 
 ### Profile Management

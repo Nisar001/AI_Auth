@@ -95,6 +95,9 @@ export class User {
   @Column({ nullable: true })
   lastLoginAt?: Date;
 
+  @Column({ nullable: true })
+  lastPasswordChange?: Date;
+
   @Column({ default: 0 })
   loginAttempts: number;
 

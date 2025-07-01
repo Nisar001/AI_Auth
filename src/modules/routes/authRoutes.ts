@@ -19,7 +19,9 @@ import {
   setup2FASchema,
   verify2FASchema,
   socialLoginSchema,
-  socialAuthCallbackSchema
+  socialAuthCallbackSchema,
+  changePasswordSchema,
+  adminChangePasswordSchema
 } from '../../validations/authValidations';
 
 const router = Router();
@@ -118,6 +120,18 @@ router.post('/logout',
 
 router.post('/logout-all',
   authController.logoutAll
+);
+
+// Change password route
+router.post('/change-password',
+  validateRequest(changePasswordSchema),
+  authController.changePassword
+);
+
+// Admin change password route (requires admin role)
+router.post('/admin/change-password',
+  validateRequest(adminChangePasswordSchema),
+  authController.adminChangePassword
 );
 
 // Routes that require email verification

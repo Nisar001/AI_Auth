@@ -315,6 +315,35 @@ export const socialAuthCallbackSchema = z.object({
   state: z.string().optional()
 });
 
+// Change password schema
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
+  newPassword: passwordSchema,
+  confirmPassword: z.string().min(1, 'Password confirmation is required')
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: 'New password and confirmation do not match',
+  path: ['confirmPassword']
+}).refine((data) => data.currentPassword !== data.newPassword, {
+  message: 'New password must be different from current password',
+  path: ['newPassword']
+});
+
+// Admin change password schema
+export const adminChangePasswordSchema = z.object({
+  userId: z.string().uuid('Invalid user ID format'),
+  newPassword: passwordSchema,
+  confirmPassword: z.string().min(1, 'Password confirmation is required'),
+  reason: z.string().optional().refine((reason) => {
+    if (reason) {
+      return reason.trim().length >= 10;
+    }
+    return true;
+  }, 'Reason must be at least 10 characters if provided')
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: 'New password and confirmation do not match',
+  path: ['confirmPassword']
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type OtpInput = z.infer<typeof otpSchema>;
@@ -332,3 +361,5 @@ export type Setup2FAInput = z.infer<typeof setup2FASchema>;
 export type Verify2FAInput = z.infer<typeof verify2FASchema>;
 export type SocialLoginInput = z.infer<typeof socialLoginSchema>;
 export type SocialAuthCallbackInput = z.infer<typeof socialAuthCallbackSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+export type AdminChangePasswordInput = z.infer<typeof adminChangePasswordSchema>;

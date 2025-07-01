@@ -274,7 +274,92 @@ Content-Type: application/json
 }
 ```
 
-### 10. Update Email (NEW)
+### 10. Change Password
+**POST** `{{base_url}}/change-password`
+
+**Headers:**
+```
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+```
+
+**Body (JSON):**
+```json
+{
+  "currentPassword": "SecurePass123!",
+  "newPassword": "NewSecurePass456!",
+  "confirmPassword": "NewSecurePass456!"
+}
+```
+
+**Description:** Change password for the authenticated user. Requires verification of current password.
+
+**Expected Response (200):**
+```json
+{
+  "success": true,
+  "message": "Password changed successfully. Please login again with your new password.",
+  "data": {
+    "message": "Password changed successfully",
+    "timestamp": "2025-06-30T...",
+    "securityNote": "All existing sessions have been invalidated. Please login again."
+  }
+}
+```
+
+**Security Features:**
+- Validates current password before allowing change
+- Ensures new password is different from current password
+- Invalidates all existing sessions (token version increment)
+- Logs password change activity for security audit
+
+**Important Notes:**
+- After password change, you'll need to login again as all tokens are invalidated
+- The user will be logged out from all devices for security
+
+### 11. Admin Change Password
+**POST** `{{base_url}}/admin/change-password`
+
+**Headers:**
+```
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+```
+
+**Body (JSON):**
+```json
+{
+  "userId": "target-user-uuid",
+  "newPassword": "AdminSetPass123!",
+  "confirmPassword": "AdminSetPass123!",
+  "reason": "User requested password reset due to security concern"
+}
+```
+
+**Description:** Admin-only endpoint to change another user's password. Requires admin role.
+
+**Expected Response (200):**
+```json
+{
+  "success": true,
+  "message": "User password changed successfully by admin",
+  "data": {
+    "targetUserId": "uuid",
+    "targetUserEmail": "target@example.com",
+    "changedBy": "admin@example.com",
+    "timestamp": "2025-06-30T...",
+    "reason": "User requested password reset due to security concern"
+  }
+}
+```
+
+**Admin Requirements:**
+- User making request must have admin role
+- Cannot change own password via this endpoint (use regular change password)
+- Reason is optional but recommended for audit trail
+- Target user's sessions are invalidated
+
+### 12. Update Email (NEW)
 **POST** `{{base_url}}/update-email`
 
 **Headers:**
@@ -304,7 +389,7 @@ Authorization: Bearer {{access_token}}
 }
 ```
 
-### 11. Confirm Email Update (NEW)
+### 13. Confirm Email Update (NEW)
 **POST** `{{base_url}}/confirm-email-update`
 
 **Headers:**
@@ -323,7 +408,7 @@ Authorization: Bearer {{access_token}}
 
 **📧 Note:** Check the new email address for the OTP verification code.
 
-### 12. Update Phone (NEW)
+### 14. Update Phone (NEW)
 **POST** `{{base_url}}/update-phone`
 
 **Headers:**
@@ -341,7 +426,7 @@ Authorization: Bearer {{access_token}}
 }
 ```
 
-### 13. Confirm Phone Update (NEW)
+### 15. Confirm Phone Update (NEW)
 **POST** `{{base_url}}/confirm-phone-update`
 
 **Headers:**
@@ -360,7 +445,7 @@ Authorization: Bearer {{access_token}}
 
 **📱 Note:** Check console for mock SMS or your phone for the OTP.
 
-### 14. Setup 2FA
+### 16. Setup 2FA
 **POST** `{{base_url}}/setup-2fa`
 
 **Headers:**
@@ -385,7 +470,7 @@ For authenticator app:
 }
 ```
 
-### 15. Verify 2FA Setup
+### 17. Verify 2FA Setup
 **POST** `{{base_url}}/verify-2fa-setup`
 
 **Headers:**
@@ -402,7 +487,7 @@ Authorization: Bearer {{access_token}}
 }
 ```
 
-### 16. Get 2FA QR Code
+### 18. Get 2FA QR Code
 **GET** `{{base_url}}/2fa-qr-code`
 
 **Headers:**
@@ -410,7 +495,7 @@ Authorization: Bearer {{access_token}}
 Authorization: Bearer {{access_token}}
 ```
 
-### 17. Disable 2FA
+### 19. Disable 2FA
 **POST** `{{base_url}}/disable-2fa`
 
 **Headers:**
@@ -426,7 +511,7 @@ Authorization: Bearer {{access_token}}
 }
 ```
 
-### 18. Refresh Token
+### 20. Refresh Token
 **POST** `{{base_url}}/refresh-token`
 
 **Headers:**
@@ -441,7 +526,7 @@ Content-Type: application/json
 }
 ```
 
-### 19. Logout
+### 21. Logout
 **POST** `{{base_url}}/logout`
 
 **Headers:**
@@ -449,7 +534,7 @@ Content-Type: application/json
 Authorization: Bearer {{access_token}}
 ```
 
-### 20. Logout All Devices
+### 22. Logout All Devices
 **POST** `{{base_url}}/logout-all`
 
 **Headers:**
@@ -459,7 +544,7 @@ Authorization: Bearer {{access_token}}
 
 ## Social Login APIs (Google & GitHub OAuth)
 
-### 21. Get Google Auth URL
+### 23. Get Google Auth URL
 **GET** `{{base_url}}/google/auth-url`
 
 **Description:** Gets the Google OAuth authorization URL for user redirection.
@@ -481,7 +566,7 @@ Authorization: Bearer {{access_token}}
 3. Complete Google OAuth flow
 4. Google redirects to your redirect URI with `code` and `state` parameters
 
-### 22. Get GitHub Auth URL
+### 24. Get GitHub Auth URL
 **GET** `{{base_url}}/github/auth-url`
 
 **Description:** Gets the GitHub OAuth authorization URL for user redirection.
@@ -503,7 +588,7 @@ Authorization: Bearer {{access_token}}
 3. Complete GitHub OAuth flow
 4. GitHub redirects to your redirect URI with `code` and `state` parameters
 
-### 23. Google OAuth Callback
+### 25. Google OAuth Callback
 **POST** `{{base_url}}/google/callback`
 
 **Headers:**
@@ -558,7 +643,7 @@ if (pm.response.code === 200) {
 }
 ```
 
-### 24. GitHub OAuth Callback
+### 26. GitHub OAuth Callback
 **POST** `{{base_url}}/github/callback`
 
 **Headers:**
@@ -613,7 +698,7 @@ if (pm.response.code === 200) {
 }
 ```
 
-### 25. Direct Social Login
+### 27. Direct Social Login
 **POST** `{{base_url}}/social-login`
 
 **Headers:**

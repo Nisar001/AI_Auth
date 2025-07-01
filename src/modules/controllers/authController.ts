@@ -11,6 +11,7 @@ import { TwoFAController } from './twoFAController';
 import { UpdateEmailController } from './updateEmailController';
 import { UpdatePhoneController } from './updatePhoneController';
 import { SocialLoginController } from './socialLoginController';
+import { ChangePasswordController } from './changePasswordController';
 import { JwtUtils } from '../../utils/jwtUtils';
 import { ApiResponse } from '../../utils/ApiResponse';
 import { ApiError } from '../../utils/ApiError';
@@ -31,6 +32,7 @@ export class AuthController {
   private updateEmailController: UpdateEmailController;
   private updatePhoneController: UpdatePhoneController;
   private socialLoginController: SocialLoginController;
+  private changePasswordController: ChangePasswordController;
 
   constructor() {
     this.registerController = new RegisterController();
@@ -45,6 +47,7 @@ export class AuthController {
     this.updateEmailController = new UpdateEmailController();
     this.updatePhoneController = new UpdatePhoneController();
     this.socialLoginController = new SocialLoginController();
+    this.changePasswordController = new ChangePasswordController();
   }
 
   // Delegate methods to individual controllers  
@@ -188,4 +191,8 @@ export class AuthController {
       throw new ApiError(500, 'Logout all failed. Please try again later.');
     }
   });
+
+  // Change Password
+  changePassword = (req: Request, res: Response, next: any) => this.changePasswordController.changePassword(req, res, next);
+  adminChangePassword = (req: Request, res: Response, next: any) => this.changePasswordController.adminChangePassword(req, res, next);
 }
