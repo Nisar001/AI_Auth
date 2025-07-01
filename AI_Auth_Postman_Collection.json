@@ -1,0 +1,825 @@
+{
+  "info": {
+    "name": "AI Auth API Collection",
+    "description": "Complete authentication API testing collection with all endpoints including social login (Google & GitHub), update email/phone functionality, and 2FA support",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "3.0.0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global pre-request script",
+          "console.log('Making request to:', pm.request.url);"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test script",
+          "pm.test('Response time is less than 2000ms', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});",
+          "",
+          "pm.test('Response has required structure', function () {",
+          "    const response = pm.response.json();",
+          "    pm.expect(response).to.have.property('success');",
+          "    pm.expect(response).to.have.property('message');",
+          "});",
+          "",
+          "if (pm.response.code >= 400) {",
+          "    pm.test('Error response has error details', function () {",
+          "        const response = pm.response.json();",
+          "        pm.expect(response.success).to.be.false;",
+          "    });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api/auth",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "1. Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('access_token', response.data.tokens.accessToken);",
+                  "    pm.environment.set('refresh_token', response.data.tokens.refreshToken);",
+                  "    pm.environment.set('user_id', response.data.user.id);",
+                  "    console.log('Tokens saved to environment');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fname\": \"John\",\n  \"mname\": \"Michael\",\n  \"lname\": \"Doe\",\n  \"email\": \"{{user_email}}\",\n  \"password\": \"SecurePass123!\",\n  \"countryCode\": \"+1\",\n  \"phone\": \"{{user_phone}}\",\n  \"dob\": \"1990-01-15\",\n  \"address\": {\n    \"houseNumber\": \"123\",\n    \"street\": \"Main Street\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"country\": \"USA\",\n    \"pincode\": \"10001\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/register",
+              "host": ["{{base_url}}"],
+              "path": ["register"]
+            }
+          }
+        },
+        {
+          "name": "2. Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('access_token', response.data.tokens.accessToken);",
+                  "    pm.environment.set('refresh_token', response.data.tokens.refreshToken);",
+                  "    console.log('Login successful, tokens updated');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"{{user_email}}\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            }
+          }
+        },
+        {
+          "name": "3. Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/refresh-token",
+              "host": ["{{base_url}}"],
+              "path": ["refresh-token"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Verification",
+      "item": [
+        {
+          "name": "1. Verify Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{user_email}}\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/verify-email",
+              "host": ["{{base_url}}"],
+              "path": ["verify-email"]
+            }
+          }
+        },
+        {
+          "name": "2. Verify Phone",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{user_phone}}\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/verify-phone",
+              "host": ["{{base_url}}"],
+              "path": ["verify-phone"]
+            }
+          }
+        },
+        {
+          "name": "3. Resend OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"{{user_email}}\",\n  \"type\": \"email\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/resend-otp",
+              "host": ["{{base_url}}"],
+              "path": ["resend-otp"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Password Management",
+      "item": [
+        {
+          "name": "1. Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"{{user_email}}\",\n  \"method\": \"email\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/forgot-password",
+              "host": ["{{base_url}}"],
+              "path": ["forgot-password"]
+            }
+          }
+        },
+        {
+          "name": "2. Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"{{user_email}}\",\n  \"otp\": \"123456\",\n  \"newPassword\": \"NewSecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/reset-password",
+              "host": ["{{base_url}}"],
+              "path": ["reset-password"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile Management",
+      "item": [
+        {
+          "name": "1. Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/profile",
+              "host": ["{{base_url}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "2. Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fname\": \"Jonathan\",\n  \"lname\": \"Smith\",\n  \"address\": {\n    \"city\": \"Los Angeles\",\n    \"state\": \"CA\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/profile",
+              "host": ["{{base_url}}"],
+              "path": ["profile"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Email and Phone Updates",
+      "item": [
+        {
+          "name": "1. Update Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newEmail\": \"john.newemail@example.com\",\n  \"currentPassword\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/update-email",
+              "host": ["{{base_url}}"],
+              "path": ["update-email"]
+            }
+          }
+        },
+        {
+          "name": "2. Confirm Email Update",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newEmail\": \"john.newemail@example.com\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/confirm-email-update",
+              "host": ["{{base_url}}"],
+              "path": ["confirm-email-update"]
+            }
+          }
+        },
+        {
+          "name": "3. Update Phone",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newPhone\": \"+1987654321\",\n  \"countryCode\": \"+1\",\n  \"currentPassword\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/update-phone",
+              "host": ["{{base_url}}"],
+              "path": ["update-phone"]
+            }
+          }
+        },
+        {
+          "name": "4. Confirm Phone Update",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newPhone\": \"+1987654321\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/confirm-phone-update",
+              "host": ["{{base_url}}"],
+              "path": ["confirm-phone-update"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Two-Factor Authentication",
+      "item": [
+        {
+          "name": "1. Setup 2FA (Email)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"method\": \"email\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/setup-2fa",
+              "host": ["{{base_url}}"],
+              "path": ["setup-2fa"]
+            }
+          }
+        },
+        {
+          "name": "2. Setup 2FA (Authenticator App)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"method\": \"auth_app\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/setup-2fa",
+              "host": ["{{base_url}}"],
+              "path": ["setup-2fa"]
+            }
+          }
+        },
+        {
+          "name": "3. Verify 2FA Setup",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"123456\",\n  \"method\": \"email\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/verify-2fa-setup",
+              "host": ["{{base_url}}"],
+              "path": ["verify-2fa-setup"]
+            }
+          }
+        },
+        {
+          "name": "4. Get 2FA QR Code",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/2fa-qr-code",
+              "host": ["{{base_url}}"],
+              "path": ["2fa-qr-code"]
+            }
+          }
+        },
+        {
+          "name": "5. Disable 2FA",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/disable-2fa",
+              "host": ["{{base_url}}"],
+              "path": ["disable-2fa"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Session Management",
+      "item": [
+        {
+          "name": "1. Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/logout",
+              "host": ["{{base_url}}"],
+              "path": ["logout"]
+            }
+          }
+        },
+        {
+          "name": "2. Logout All Devices",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/logout-all",
+              "host": ["{{base_url}}"],
+              "path": ["logout-all"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Social Login",
+      "item": [
+        {
+          "name": "1. Get Google Auth URL",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/google/auth-url",
+              "host": ["{{base_url}}"],
+              "path": ["google", "auth-url"]
+            },
+            "description": "Get Google OAuth authorization URL"
+          },
+          "response": []
+        },
+        {
+          "name": "2. Get GitHub Auth URL",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/github/auth-url",
+              "host": ["{{base_url}}"],
+              "path": ["github", "auth-url"]
+            },
+            "description": "Get GitHub OAuth authorization URL"
+          },
+          "response": []
+        },
+        {
+          "name": "3. Google OAuth Callback",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data.tokens) {",
+                  "        pm.environment.set('access_token', response.data.tokens.accessToken);",
+                  "        pm.environment.set('refresh_token', response.data.tokens.refreshToken);",
+                  "        pm.environment.set('user_id', response.data.user.id);",
+                  "        console.log('Social login successful, tokens saved');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"authorization_code_from_google\",\n  \"state\": \"state_parameter_from_auth_url\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/google/callback",
+              "host": ["{{base_url}}"],
+              "path": ["google", "callback"]
+            },
+            "description": "Handle Google OAuth callback with authorization code"
+          },
+          "response": []
+        },
+        {
+          "name": "4. GitHub OAuth Callback",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data.tokens) {",
+                  "        pm.environment.set('access_token', response.data.tokens.accessToken);",
+                  "        pm.environment.set('refresh_token', response.data.tokens.refreshToken);",
+                  "        pm.environment.set('user_id', response.data.user.id);",
+                  "        console.log('Social login successful, tokens saved');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"authorization_code_from_github\",\n  \"state\": \"state_parameter_from_auth_url\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/github/callback",
+              "host": ["{{base_url}}"],
+              "path": ["github", "callback"]
+            },
+            "description": "Handle GitHub OAuth callback with authorization code"
+          },
+          "response": []
+        },
+        {
+          "name": "5. Direct Social Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('access_token', response.data.tokens.accessToken);",
+                  "    pm.environment.set('refresh_token', response.data.tokens.refreshToken);",
+                  "    pm.environment.set('user_id', response.data.user.id);",
+                  "    console.log('Social login successful, tokens saved');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"provider\": \"google\",\n  \"accessToken\": \"social_provider_access_token\",\n  \"email\": \"user@example.com\",\n  \"name\": \"John Doe\",\n  \"socialId\": \"google_user_id_123456\",\n  \"avatar\": \"https://example.com/avatar.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/social-login",
+              "host": ["{{base_url}}"],
+              "path": ["social-login"]
+            },
+            "description": "Direct social login with provider access token"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Error Testing",
+      "item": [
+        {
+          "name": "Invalid Email Format",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fname\": \"Test\",\n  \"lname\": \"User\",\n  \"email\": \"invalid-email\",\n  \"password\": \"SecurePass123!\",\n  \"countryCode\": \"+1\",\n  \"phone\": \"+1234567890\",\n  \"dob\": \"1990-01-15\",\n  \"address\": {\n    \"houseNumber\": \"123\",\n    \"street\": \"Test St\",\n    \"city\": \"Test\",\n    \"state\": \"TS\",\n    \"country\": \"Test\",\n    \"pincode\": \"12345\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/register",
+              "host": ["{{base_url}}"],
+              "path": ["register"]
+            }
+          }
+        },
+        {
+          "name": "Weak Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fname\": \"Test\",\n  \"lname\": \"User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"123\",\n  \"countryCode\": \"+1\",\n  \"phone\": \"+1234567890\",\n  \"dob\": \"1990-01-15\",\n  \"address\": {\n    \"houseNumber\": \"123\",\n    \"street\": \"Test St\",\n    \"city\": \"Test\",\n    \"state\": \"TS\",\n    \"country\": \"Test\",\n    \"pincode\": \"12345\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/register",
+              "host": ["{{base_url}}"],
+              "path": ["register"]
+            }
+          }
+        },
+        {
+          "name": "Invalid Login Credentials",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"wrong@example.com\",\n  \"password\": \"wrongpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            }
+          }
+        },
+        {
+          "name": "Unauthorized Access (No Token)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/profile",
+              "host": ["{{base_url}}"],
+              "path": ["profile"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

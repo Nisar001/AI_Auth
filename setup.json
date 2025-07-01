@@ -1,0 +1,11 @@
+{
+  "name": "setup-dev",
+  "version": "1.0.0",
+  "scripts": {
+    "setup": "npm run copy-env && npm run create-logs",
+    "copy-env": "cp .env.example .env",
+    "create-logs": "mkdir -p logs",
+    "check-env": "node -e \"require('dotenv').config(); console.log('Environment loaded successfully')\"",
+    "db-check": "node -e \"console.log('Database connection test - implement this')\""
+  }
+}

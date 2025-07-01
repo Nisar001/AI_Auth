@@ -1,0 +1,154 @@
+{
+  "name": "Social Login",
+  "item": [
+    {
+      "name": "1. Get Google Auth URL",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/google/auth-url",
+          "host": ["{{base_url}}"],
+          "path": ["google", "auth-url"]
+        },
+        "description": "Get Google OAuth authorization URL"
+      },
+      "response": []
+    },
+    {
+      "name": "2. Get GitHub Auth URL",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/github/auth-url",
+          "host": ["{{base_url}}"],
+          "path": ["github", "auth-url"]
+        },
+        "description": "Get GitHub OAuth authorization URL"
+      },
+      "response": []
+    },
+    {
+      "name": "3. Google OAuth Callback",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    const response = pm.response.json();",
+              "    if (response.data.tokens) {",
+              "        pm.environment.set('access_token', response.data.tokens.accessToken);",
+              "        pm.environment.set('refresh_token', response.data.tokens.refreshToken);",
+              "        pm.environment.set('user_id', response.data.user.id);",
+              "        console.log('Social login successful, tokens saved');",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"code\": \"authorization_code_from_google\",\n  \"state\": \"state_parameter_from_auth_url\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/google/callback",
+          "host": ["{{base_url}}"],
+          "path": ["google", "callback"]
+        },
+        "description": "Handle Google OAuth callback with authorization code"
+      },
+      "response": []
+    },
+    {
+      "name": "4. GitHub OAuth Callback",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    const response = pm.response.json();",
+              "    if (response.data.tokens) {",
+              "        pm.environment.set('access_token', response.data.tokens.accessToken);",
+              "        pm.environment.set('refresh_token', response.data.tokens.refreshToken);",
+              "        pm.environment.set('user_id', response.data.user.id);",
+              "        console.log('Social login successful, tokens saved');",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"code\": \"authorization_code_from_github\",\n  \"state\": \"state_parameter_from_auth_url\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/github/callback",
+          "host": ["{{base_url}}"],
+          "path": ["github", "callback"]
+        },
+        "description": "Handle GitHub OAuth callback with authorization code"
+      },
+      "response": []
+    },
+    {
+      "name": "5. Direct Social Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    const response = pm.response.json();",
+              "    pm.environment.set('access_token', response.data.tokens.accessToken);",
+              "    pm.environment.set('refresh_token', response.data.tokens.refreshToken);",
+              "    pm.environment.set('user_id', response.data.user.id);",
+              "    console.log('Social login successful, tokens saved');",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"provider\": \"google\",\n  \"accessToken\": \"social_provider_access_token\",\n  \"email\": \"user@example.com\",\n  \"name\": \"John Doe\",\n  \"socialId\": \"google_user_id_123456\",\n  \"avatar\": \"https://example.com/avatar.jpg\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/social-login",
+          "host": ["{{base_url}}"],
+          "path": ["social-login"]
+        },
+        "description": "Direct social login with provider access token"
+      },
+      "response": []
+    }
+  ]
+}
