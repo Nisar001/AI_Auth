@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/server.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "dev": "nodemon",
-    "clean": "rimraf dist",
-    "prebuild": "npm run clean"
-  },
+  "clean": "rimraf dist",
+  "prebuild": "npm run clean",
+  "build": "tsc",
+  "start": "node dist/server.js",
+  "dev": "nodemon src/server.ts"
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Nisar001/AI_Auth.git"
