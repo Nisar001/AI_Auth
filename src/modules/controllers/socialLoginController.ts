@@ -665,4 +665,125 @@ export class SocialLoginController {
       return false;
     }
   }
+
+  // Link social account to existing user
+  linkSocialAccount = asyncHandler(async (req: Request, res: Response) => {
+    try {
+      const { provider, socialId, email } = req.body;
+      const userId = (req as any).user.id;
+
+      if (!provider || !socialId || !email) {
+        throw new ApiError(400, 'Provider, social ID, and email are required');
+      }
+
+      // Find current user
+      const user = await this.userRepository.findOne({
+        where: { id: userId }
+      });
+
+      if (!user) {
+        throw new ApiError(404, 'User not found');
+      }
+
+      // Check if social account is already linked to another user
+      const existingUser = await this.userRepository.findOne({
+        where: { socialId, authType: provider }
+      });
+
+      if (existingUser && existingUser.id !== userId) {
+        throw new ApiError(409, 'This social account is already linked to another user');
+      }
+
+      // Update user with social account info
+      user.socialId = socialId;
+      user.authType = provider;
+      await this.userRepository.save(user);
+
+      logger.info('Social account linked successfully', {
+        userId,
+        provider,
+        socialId
+      });
+
+      res.status(200).json(
+        ApiResponse.success(
+          {
+            user: {
+              id: user.id,
+              email: user.email,
+              authType: user.authType,
+              socialId: user.socialId
+            }
+          },
+          'Social account linked successfully',
+          200
+        )
+      );
+    } catch (error: any) {
+      logger.error('Link social account failed:', error);
+      
+      if (error instanceof ApiError) {
+        throw error;
+      }
+
+      throw new ApiError(500, 'Failed to link social account');
+    }
+  });
+
+  // Unlink social account from user
+  unlinkSocialAccount = asyncHandler(async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).user.id;
+
+      // Find user
+      const user = await this.userRepository.findOne({
+        where: { id: userId }
+      });
+
+      if (!user) {
+        throw new ApiError(404, 'User not found');
+      }
+
+      // Check if user has a social account linked
+      if (!user.socialId) {
+        throw new ApiError(400, 'No social account is currently linked');
+      }
+
+      // Check if user has a password (can't unlink if no password)
+      if (!user.password) {
+        throw new ApiError(400, 'Cannot unlink social account without setting a password first');
+      }
+
+      // Unlink social account
+      user.socialId = undefined;
+      user.authType = 'email';
+      await this.userRepository.save(user);
+
+      logger.info('Social account unlinked successfully', {
+        userId
+      });
+
+      res.status(200).json(
+        ApiResponse.success(
+          {
+            user: {
+              id: user.id,
+              email: user.email,
+              authType: user.authType
+            }
+          },
+          'Social account unlinked successfully',
+          200
+        )
+      );
+    } catch (error: any) {
+      logger.error('Unlink social account failed:', error);
+      
+      if (error instanceof ApiError) {
+        throw error;
+      }
+
+      throw new ApiError(500, 'Failed to unlink social account');
+    }
+  });
 }

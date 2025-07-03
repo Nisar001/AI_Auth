@@ -6,19 +6,32 @@ import { OtpService as OtpServiceModel } from '../../models/OtpService';
 import { ApiResponse } from '../../utils/ApiResponse';
 import { ApiError } from '../../utils/ApiError';
 import { UpdatePhoneInput, ConfirmUpdatePhoneInput } from '../../validations/authValidations';
+import { PasswordUtils } from '../../utils/passwordUtils';
 import { asyncHandler } from '../../middlewares/errorHandler';
 import { OtpService } from '../../services/otpService';
 import logger from '../../utils/logger';
 
 export class UpdatePhoneController {
+  // Expose raw async methods for direct testing (bypassing asyncHandler/Express)
+  async rawUpdatePhone(req: any, res: any, next: any) {
+    return this.updatePhone(req, res, next);
+  }
+
+  async rawConfirmUpdatePhone(req: any, res: any, next: any) {
+    return this.confirmUpdatePhone(req, res, next);
+  }
   private userRepository: Repository<User>;
   private otpRepository: Repository<OtpServiceModel>;
   private otpService: OtpService;
 
-  constructor() {
-    this.userRepository = AppDataSource.getRepository(User);
-    this.otpRepository = AppDataSource.getRepository(OtpServiceModel);
-    this.otpService = new OtpService();
+  constructor(
+    userRepository?: Repository<User>,
+    otpRepository?: Repository<OtpServiceModel>,
+    otpService?: OtpService
+  ) {
+    this.userRepository = userRepository || AppDataSource.getRepository(User);
+    this.otpRepository = otpRepository || AppDataSource.getRepository(OtpServiceModel);
+    this.otpService = otpService || new OtpService();
   }
 
   // Request phone update
@@ -44,9 +57,12 @@ export class UpdatePhoneController {
         throw new ApiError(404, 'User not found');
       }
 
+      if (!user.password) {
+        throw new ApiError(400, 'User password not set');
+      }
+
       // Verify current password
-      const bcrypt = require('bcryptjs');
-      const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+      const isPasswordValid = await PasswordUtils.comparePassword(currentPassword, user.password);
       if (!isPasswordValid) {
         throw new ApiError(401, 'Current password is incorrect');
       }
@@ -71,6 +87,7 @@ export class UpdatePhoneController {
       // Store new phone temporarily
       user.pendingPhone = sanitizedPhone;
       user.tempPhone = sanitizedCountryCode; // Store country code temporarily
+      console.log('DEBUG: Calling userRepository.save with', user);
       await this.userRepository.save(user);
 
       // Generate and send OTP to new phone
@@ -186,6 +203,7 @@ export class UpdatePhoneController {
       user.pendingPhone = undefined;
       user.tempPhone = undefined;
       user.isPhoneVerified = true; // Since they verified the new phone
+      console.log('DEBUG: Calling userRepository.save with', user);
       await this.userRepository.save(user);
 
       // Mark all other phone update OTPs as used

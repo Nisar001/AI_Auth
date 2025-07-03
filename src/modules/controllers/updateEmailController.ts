@@ -6,6 +6,7 @@ import { OtpService as OtpServiceModel } from '../../models/OtpService';
 import { ApiResponse } from '../../utils/ApiResponse';
 import { ApiError } from '../../utils/ApiError';
 import { UpdateEmailInput, ConfirmUpdateEmailInput } from '../../validations/authValidations';
+import { PasswordUtils } from '../../utils/passwordUtils';
 import { asyncHandler } from '../../middlewares/errorHandler';
 import { OtpService } from '../../services/otpService';
 import logger from '../../utils/logger';
@@ -22,7 +23,8 @@ export class UpdateEmailController {
   }
 
   // Request email update
-  updateEmail = asyncHandler(async (req: Request, res: Response) => {
+  // For testing, export the raw async function as well
+  rawUpdateEmail = async (req: Request, res: Response, next: Function) => {
     try {
       const { newEmail, currentPassword }: UpdateEmailInput = req.body;
       const userId = (req as any).user.id;
@@ -43,9 +45,12 @@ export class UpdateEmailController {
         throw new ApiError(404, 'User not found');
       }
 
+      if (!user.password) {
+        throw new ApiError(400, 'User password not set');
+      }
+
       // Verify current password
-      const bcrypt = require('bcryptjs');
-      const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+      const isPasswordValid = await PasswordUtils.comparePassword(currentPassword, user.password);
       if (!isPasswordValid) {
         throw new ApiError(401, 'Current password is incorrect');
       }
@@ -105,10 +110,11 @@ export class UpdateEmailController {
 
       throw new ApiError(500, 'Email update request failed. Please try again later.');
     }
-  });
+  };
+  updateEmail = asyncHandler(this.rawUpdateEmail);
 
   // Confirm email update with OTP
-  confirmUpdateEmail = asyncHandler(async (req: Request, res: Response) => {
+  rawConfirmUpdateEmail = async (req: Request, res: Response, next: Function) => {
     try {
       const { newEmail, otp }: ConfirmUpdateEmailInput = req.body;
       const userId = (req as any).user.id;
@@ -215,5 +221,6 @@ export class UpdateEmailController {
 
       throw new ApiError(500, 'Email update confirmation failed. Please try again later.');
     }
-  });
+  };
+  confirmUpdateEmail = asyncHandler(this.rawConfirmUpdateEmail);
 }

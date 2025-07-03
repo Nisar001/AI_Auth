@@ -82,7 +82,7 @@ export class JwtUtils {
     }
 
     const parts = authorization.split(' ');
-    if (parts.length !== 2 || parts[0] !== 'Bearer') {
+    if (parts.length !== 2 || parts[0] !== 'Bearer' || !parts[1].trim()) {
       throw new ApiError(401, 'Invalid authorization header format');
     }
 
