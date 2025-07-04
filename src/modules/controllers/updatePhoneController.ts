@@ -43,8 +43,10 @@ export class UpdatePhoneController {
       // Sanitize input
       const sanitizedPhone = newPhone.trim();
       const sanitizedCountryCode = countryCode.trim();
+      console.log('[DEBUG] sanitizedPhone:', sanitizedPhone, 'sanitizedCountryCode:', sanitizedCountryCode);
 
       if (!sanitizedPhone || !sanitizedCountryCode || !currentPassword) {
+        console.log('[DEBUG] Missing input');
         throw new ApiError(400, 'New phone, country code, and password are required');
       }
 
@@ -52,23 +54,29 @@ export class UpdatePhoneController {
       const user = await this.userRepository.findOne({
         where: { id: userId }
       });
+      console.log('[DEBUG] user:', user);
 
       if (!user) {
+        console.log('[DEBUG] User not found');
         throw new ApiError(404, 'User not found');
       }
 
       if (!user.password) {
+        console.log('[DEBUG] User password not set');
         throw new ApiError(400, 'User password not set');
       }
 
       // Verify current password
       const isPasswordValid = await PasswordUtils.comparePassword(currentPassword, user.password);
+      console.log('[DEBUG] isPasswordValid:', isPasswordValid);
       if (!isPasswordValid) {
+        console.log('[DEBUG] Current password is incorrect');
         throw new ApiError(401, 'Current password is incorrect');
       }
 
       // Check if new phone is different from current
       if (sanitizedPhone === user.phone && sanitizedCountryCode === user.countryCode) {
+        console.log('[DEBUG] New phone is same as current');
         throw new ApiError(400, 'New phone number must be different from current phone number');
       }
 
@@ -79,15 +87,17 @@ export class UpdatePhoneController {
           countryCode: sanitizedCountryCode
         }
       });
+      console.log('[DEBUG] existingUser:', existingUser);
 
       if (existingUser) {
+        console.log('[DEBUG] Phone number already registered');
         throw new ApiError(409, 'Phone number is already registered with another account');
       }
 
       // Store new phone temporarily
       user.pendingPhone = sanitizedPhone;
       user.tempPhone = sanitizedCountryCode; // Store country code temporarily
-      console.log('DEBUG: Calling userRepository.save with', user);
+      console.log('[DEBUG] Saving user:', user);
       await this.userRepository.save(user);
 
       // Generate and send OTP to new phone
@@ -96,14 +106,16 @@ export class UpdatePhoneController {
         phone: sanitizedPhone, 
         countryCode: sanitizedCountryCode 
       } as User;
-      
+      console.log('[DEBUG] tempUser for OTP:', tempUser);
       const otpResult = await this.otpService.generateAndSendOtp(
         tempUser,
         'sms',
         'phone update'
       );
+      console.log('[DEBUG] otpResult:', otpResult);
 
       if (!otpResult.success) {
+        console.log('[DEBUG] Failed to send OTP');
         throw new ApiError(500, 'Failed to send verification code to new phone number');
       }
 
@@ -126,11 +138,9 @@ export class UpdatePhoneController {
       );
     } catch (error: any) {
       logger.error('Phone update request failed:', error);
-      
       if (error instanceof ApiError) {
         throw error;
       }
-
       throw new ApiError(500, 'Phone update request failed. Please try again later.');
     }
   });
