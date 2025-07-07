@@ -14,6 +14,7 @@ export const authenticateToken = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
+  console.log(`Debug: authenticateToken middleware executed for ${req.path}`);
   try {
     const token = JwtUtils.getTokenFromHeader(req.headers.authorization);
     const payload = JwtUtils.verifyAccessToken(token);

@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`2FA Integration should initiate 2FA setup 1`] = `
+{
+  "data": {
+    "instructions": Any<Array>,
+    "method": "email",
+    "status": "setup_initiated",
+  },
+  "message": Any<String>,
+  "statusCode": Any<Number>,
+  "success": Any<Boolean>,
+}
+`;

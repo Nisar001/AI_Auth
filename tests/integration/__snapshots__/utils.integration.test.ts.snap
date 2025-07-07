@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Utils Integration (JWT, API Health) should return health status 1`] = `
+{
+  "environment": "test",
+  "status": "OK",
+  "timestamp": "2025-07-07T11:57:03.815Z",
+  "uptime": Any<Number>,
+}
+`;

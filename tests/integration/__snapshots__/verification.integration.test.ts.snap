@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Resend OTP Integration Tests should enforce rate limiting for OTP requests 1`] = `
+{
+  "data": null,
+  "message": "Too many OTP requests, please try again in 5 minutes",
+  "statusCode": 429,
+  "success": false,
+}
+`;
+
+exports[`Resend OTP Integration Tests should resend email OTP successfully 1`] = `
+{
+  "data": Any<Object>,
+  "message": Any<String>,
+  "statusCode": Any<Number>,
+  "success": Any<Boolean>,
+}
+`;
+
+exports[`Resend OTP Integration Tests should resend phone OTP successfully 1`] = `
+{
+  "data": Any<Object>,
+  "message": Any<String>,
+  "statusCode": Any<Number>,
+  "success": Any<Boolean>,
+}
+`;
+
+exports[`Resend OTP Integration Tests should return error for invalid identifier 1`] = `
+{
+  "data": {},
+  "message": Any<String>,
+  "statusCode": 200,
+  "success": true,
+}
+`;

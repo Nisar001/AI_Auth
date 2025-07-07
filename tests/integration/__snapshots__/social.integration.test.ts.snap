@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Social Login Integration should get GitHub OAuth URL 1`] = `
+{
+  "data": {
+    "authUrl": "https://github.com/login/oauth/authorize?client_id=Ov23li0YXXoBXZQpDI23&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth%2Fgithub%2Fcallback&scope=user%3Aemail&state=f03dbc2a9144c9fb36ffdd874ecb95edd21c41bec2c1c31384f329fd2f833f0a",
+    "provider": "github",
+    "state": "f03dbc2a9144c9fb36ffdd874ecb95edd21c41bec2c1c31384f329fd2f833f0a",
+  },
+  "message": "GitHub OAuth URL generated successfully",
+  "statusCode": 200,
+  "success": true,
+}
+`;
+
+exports[`Social Login Integration should get Google OAuth URL 1`] = `
+{
+  "data": {
+    "authUrl": "https://accounts.google.com/o/oauth2/v2/auth?client_id=1088061610840-prcu4cbids3vkli59ns903pa2ko4t9j8.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth%2Fgoogle%2Fcallback&response_type=code&scope=openid%20email%20profile&state=3e54528b99bf8ba836db0da828dab6f4c40f22e381af6df99fb3783cd956cc67&access_type=offline&prompt=consent",
+    "provider": "google",
+    "state": "3e54528b99bf8ba836db0da828dab6f4c40f22e381af6df99fb3783cd956cc67",
+  },
+  "message": "Google OAuth URL generated successfully",
+  "statusCode": 200,
+  "success": true,
+}
+`;
+
+exports[`Social Login Integration should handle social login successfully 1`] = `
+{
+  "email": Any<String>,
+  "id": Any<Number>,
+  "socialId": Any<String>,
+}
+`;

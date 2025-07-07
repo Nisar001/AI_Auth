@@ -92,7 +92,7 @@ export const validateRequest = (schema: ZodSchema) => {
 
         res.status(400).json(
           ApiResponse.error(
-            'Validation failed. Please check the required fields and try again.',
+            errorMessages.length > 0 ? errorMessages[0].message : 'Validation failed. Please check the required fields and try again.',
             400,
             errorMessages
           )

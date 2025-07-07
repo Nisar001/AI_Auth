@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request } from 'express';
 import { AuthController } from '../controllers/authController';
 import { validateRequest } from '../../middlewares/validation';
 import { authLimiter, otpLimiter, passwordResetLimiter } from '../../middlewares/rateLimiter';
@@ -26,6 +26,14 @@ import {
 
 const router = Router();
 const authController = new AuthController();
+
+console.log('Debug: authRoutes initialized');
+
+// Middleware to trace request paths
+router.use((req, res, next) => {
+  console.log(`Debug: Middleware executed for ${req.path}`);
+  next();
+});
 
 // Public routes
 router.post('/register', 
@@ -188,5 +196,43 @@ router.get('/2fa-qr-code',
   requirePhoneVerification,
   authController.get2FAQRCode
 );
+
+// Middleware validation route
+interface AuthenticatedRequest extends Request {
+  user?: {
+    id: string;
+    fname: string;
+    mname?: string;
+    lname: string;
+    email: string;
+    isEmailVerified: boolean;
+    countryCode: string;
+    phone: string;
+    isPhoneVerified: boolean;
+    houseNumber: string;
+    streetName: string;
+    city: string;
+    state: string;
+    country: string;
+    zipCode: string;
+    street: string;
+    pincode: string;
+    dob: Date;
+    authType: string;
+    is2FAEnabled: boolean;
+    preferred2FAMethods: string;
+    tokenVersion: number;
+    loginAttempts: number;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+}
+
+router.get('/protected-route', (req: AuthenticatedRequest, res) => {
+  console.log('Debug: /protected-route handler executed with user:', req.user);
+  res.status(200).json({ message: 'Access granted' });
+});
+
+console.log('Debug: /protected-route registered');
 
 export default router;
