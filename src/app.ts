@@ -27,6 +27,12 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Apply rate limiting to all requests
 app.use(generalLimiter);
 
+// Debugging middleware
+app.use((req, res, next) => {
+  console.log(`Debug: Incoming request to ${req.path}`);
+  next();
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
@@ -39,6 +45,7 @@ app.get('/health', (req, res) => {
 
 // API routes
 app.use('/api/auth', authRoutes);
+console.log('Debug: Mounted /api/auth routes');
 
 // Handle 404 errors
 app.use(notFoundHandler);
@@ -69,5 +76,7 @@ process.on('SIGTERM', async () => {
     process.exit(1);
   }
 });
+
+console.log('Debug: Application initialized');
 
 export { app, initializeDatabase };

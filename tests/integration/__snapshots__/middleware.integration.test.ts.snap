@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Middleware Integration should allow access to profile route with valid token 1`] = `
+{
+  "data": {
+    "user": {
+      "address": {
+        "city": "Metropolis",
+        "country": "USA",
+        "houseNumber": "123",
+        "pincode": "12345",
+        "state": "NY",
+        "street": "Main St",
+      },
+      "authType": "password",
+      "countryCode": "+1",
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "dob": "1990-01-01T00:00:00.000Z",
+      "email": "middlewareuser@example.com",
+      "fname": "John",
+      "id": "test-user-id",
+      "is2FAEnabled": false,
+      "isEmailVerified": true,
+      "isPhoneVerified": true,
+      "lname": "Doe",
+      "phone": "1234567890",
+      "updatedAt": "2025-07-01T00:00:00.000Z",
+    },
+  },
+  "message": "Profile retrieved successfully",
+  "statusCode": 200,
+  "success": true,
+}
+`;
+
+exports[`Middleware Integration should reject access to profile route without token 1`] = `
+{
+  "message": "Authentication required",
+}
+`;
+
+exports[`Middleware Integration should validate middleware successfully 1`] = `
+{
+  "message": "Access granted",
+}
+`;

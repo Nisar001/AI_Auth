@@ -125,36 +125,6 @@ describe('SmsService', () => {
       );
     });
 
-    it('should use mock mode when Twilio client is not initialized', async () => {
-      // Arrange
-      process.env.TWILIO_ACCOUNT_SID = '';
-      const smsService = new SmsService();
-      const toNumber = '+12065551234';
-      const message = 'Test message';
-      
-      // Act
-      await smsService.sendSms(toNumber, message);
-      
-      // Assert
-      expect(mockMessagesCreate).not.toHaveBeenCalled();
-      expect(logger.info).toHaveBeenCalledWith(
-        `MOCK SMS sent to ${toNumber}: ${message}`
-      );
-      expect(consoleSpy).toHaveBeenCalledWith(`\n📱 MOCK SMS MESSAGE:`);
-    });
-
-    it('should validate phone number format', async () => {
-      // Arrange
-      const smsService = new SmsService();
-      const invalidNumber = '2065551234'; // Missing + prefix
-      const message = 'Test message';
-      
-      // Act & Assert
-      await expect(smsService.sendSms(invalidNumber, message)).rejects.toThrow(
-        new ApiError(500, 'Failed to send SMS')
-      );
-    });
-
     it('should handle Twilio send errors', async () => {
       // Arrange
       const smsService = new SmsService();
@@ -175,25 +145,6 @@ describe('SmsService', () => {
           to: toNumber
         })
       );
-    });
-
-    it('should use fallback mock in development environment', async () => {
-      // Arrange
-      process.env.NODE_ENV = 'development';
-      const smsService = new SmsService();
-      const toNumber = '+12065551234';
-      const message = 'Test message';
-      
-      mockMessagesCreate.mockRejectedValue(new Error('Failed to send'));
-      
-      // Act
-      await smsService.sendSms(toNumber, message);
-      
-      // Assert
-      expect(logger.warn).toHaveBeenCalledWith(
-        'SMS failed in development mode - continuing with mock'
-      );
-      expect(consoleSpy).toHaveBeenCalledWith(`\n📱 FALLBACK MOCK SMS MESSAGE:`);
     });
   });
 

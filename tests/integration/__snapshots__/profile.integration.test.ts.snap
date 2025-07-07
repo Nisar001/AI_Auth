@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Profile Integration should get user profile 1`] = `
+{
+  "data": {
+    "user": {
+      "address": {},
+      "email": "profileuser@example.com",
+      "fname": "Test",
+      "id": 1,
+      "lname": "User",
+    },
+  },
+  "message": "Profile retrieved successfully",
+  "statusCode": 200,
+  "success": true,
+}
+`;
+
+exports[`Profile Integration should retrieve user profile successfully 1`] = `
+{
+  "email": Any<String>,
+  "id": Any<Number>,
+  "profile": {
+    "name": Any<String>,
+  },
+}
+`;
+
+exports[`Profile Integration should update user profile 1`] = `
+{
+  "data": {
+    "user": {
+      "address": {},
+      "email": "profileuser@example.com",
+      "fname": "Updated",
+      "id": 1,
+      "lname": "Name",
+    },
+  },
+  "message": "Profile updated successfully",
+  "statusCode": 200,
+  "success": true,
+}
+`;

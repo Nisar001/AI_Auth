@@ -102,8 +102,12 @@ describe('ChangePasswordController', () => {
 
       mockUserRepository.findOne.mockResolvedValue(mockUser);
       (PasswordUtils.comparePassword as jest.Mock)
-        .mockResolvedValueOnce(true)   // for current password verification  
+        .mockResolvedValueOnce(true)   // for current password verification
         .mockResolvedValueOnce(false); // for checking if new password is different
+      (PasswordUtils.validatePasswordStrength as jest.Mock).mockReturnValue({
+        isValid: true,
+        errors: []
+      });
       (PasswordUtils.hashPassword as jest.Mock).mockResolvedValue('newHashedPassword');
       mockUserRepository.update.mockResolvedValue({ affected: 1 });
 
@@ -112,7 +116,7 @@ describe('ChangePasswordController', () => {
       expect(PasswordUtils.comparePassword).toHaveBeenNthCalledWith(1, 'OldPassword123!', 'oldHashedPassword');
       expect(PasswordUtils.comparePassword).toHaveBeenNthCalledWith(2, 'NewSecurePass123!', 'oldHashedPassword');
       expect(PasswordUtils.hashPassword).toHaveBeenCalledWith('NewSecurePass123!');
-      
+
       expect(mockUserRepository.update).toHaveBeenCalledWith(
         '1',
         expect.objectContaining({
@@ -126,7 +130,12 @@ describe('ChangePasswordController', () => {
       expect(mockResponse.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: true,
-          message: expect.stringContaining('Password changed successfully')
+          message: 'Password changed successfully. Please login again with your new password.',
+          data: expect.objectContaining({
+            message: 'Password changed successfully',
+            timestamp: expect.any(String),
+            securityNote: expect.stringContaining('All existing sessions have been invalidated')
+          })
         })
       );
     });
@@ -293,7 +302,7 @@ describe('ChangePasswordController', () => {
       (PasswordUtils.comparePassword as jest.Mock)
         .mockResolvedValueOnce(true)
         .mockResolvedValueOnce(false);
-      (PasswordUtils.hashPassword as jest.Mock).mockResolvedValue('newHashedPassword');
+      (PasswordUtils.hashPassword as jest.Mock).mockResolvedValueOnce('newHashedPassword');
       mockUserRepository.update.mockRejectedValue(new Error('Database error'));
 
       await changePasswordController.changePassword(mockRequest as AuthenticatedRequest, mockResponse as Response, mockNext);
