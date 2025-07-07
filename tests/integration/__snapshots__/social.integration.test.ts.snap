@@ -3,9 +3,9 @@
 exports[`Social Login Integration should get GitHub OAuth URL 1`] = `
 {
   "data": {
-    "authUrl": "https://github.com/login/oauth/authorize?client_id=Ov23li0YXXoBXZQpDI23&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth%2Fgithub%2Fcallback&scope=user%3Aemail&state=f03dbc2a9144c9fb36ffdd874ecb95edd21c41bec2c1c31384f329fd2f833f0a",
+    "authUrl": "https://github.com/login/oauth/authorize?client_id=Ov23li0YXXoBXZQpDI23&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth%2Fgithub%2Fcallback&scope=user%3Aemail&state=fd229280be02b4e635d7aa38119f763cabc08e29b4b5bd008d06d97985454a8a",
     "provider": "github",
-    "state": "f03dbc2a9144c9fb36ffdd874ecb95edd21c41bec2c1c31384f329fd2f833f0a",
+    "state": "fd229280be02b4e635d7aa38119f763cabc08e29b4b5bd008d06d97985454a8a",
   },
   "message": "GitHub OAuth URL generated successfully",
   "statusCode": 200,
@@ -16,9 +16,9 @@ exports[`Social Login Integration should get GitHub OAuth URL 1`] = `
 exports[`Social Login Integration should get Google OAuth URL 1`] = `
 {
   "data": {
-    "authUrl": "https://accounts.google.com/o/oauth2/v2/auth?client_id=1088061610840-prcu4cbids3vkli59ns903pa2ko4t9j8.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth%2Fgoogle%2Fcallback&response_type=code&scope=openid%20email%20profile&state=3e54528b99bf8ba836db0da828dab6f4c40f22e381af6df99fb3783cd956cc67&access_type=offline&prompt=consent",
+    "authUrl": "https://accounts.google.com/o/oauth2/v2/auth?client_id=1088061610840-prcu4cbids3vkli59ns903pa2ko4t9j8.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth%2Fgoogle%2Fcallback&response_type=code&scope=openid%20email%20profile&state=96222c1856ce99899fc0143bdc52fc2c8c1770d4ba7ff6ab7746a3dcc2485d32&access_type=offline&prompt=consent",
     "provider": "google",
-    "state": "3e54528b99bf8ba836db0da828dab6f4c40f22e381af6df99fb3783cd956cc67",
+    "state": "96222c1856ce99899fc0143bdc52fc2c8c1770d4ba7ff6ab7746a3dcc2485d32",
   },
   "message": "Google OAuth URL generated successfully",
   "statusCode": 200,

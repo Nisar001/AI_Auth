@@ -4,7 +4,7 @@ exports[`Utils Integration (JWT, API Health) should return health status 1`] = `
 {
   "environment": "test",
   "status": "OK",
-  "timestamp": "2025-07-07T11:57:03.815Z",
+  "timestamp": "2025-07-07T12:30:44.087Z",
   "uptime": Any<Number>,
 }
 `;
